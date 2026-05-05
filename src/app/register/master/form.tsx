@@ -30,7 +30,7 @@ import { api } from "~/trpc/react";
 
 const formSchema = z.object({
   centerId: z.string().min(1, "Please choose a center"),
-  desiredLevel: z.coerce.number().int().min(1).max(99),
+  desiredLevel: z.number().int().min(1).max(99),
   titleTh: z.string().optional(),
   firstNameTh: z.string().optional(),
   lastNameTh: z.string().optional(),
@@ -149,7 +149,15 @@ export function MasterRegistrationForm() {
               <FormItem>
                 <FormLabel>Desired level</FormLabel>
                 <FormControl>
-                  <Input type="number" min={1} max={99} {...field} />
+                  <Input
+                    type="number"
+                    min={1}
+                    max={99}
+                    {...field}
+                    onChange={(event) =>
+                      field.onChange(event.currentTarget.valueAsNumber)
+                    }
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
