@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "Global K-Beauty",
+    "tagline": "다역할 자격 인증 플랫폼"
+  },
+  "auth": {
+    "signIn": "로그인",
+    "signOut": "로그아웃",
+    "continueWithGoogle": "Google 계정으로 계속",
+    "signedInAs": "{email} 계정으로 로그인됨",
+    "continue": "계속"
+  },
+  "register": {
+    "chooseRole": "역할 선택",
+    "chooseRoleSubtitle": "등록할 역할을 선택하세요. 하나만 선택할 수 있습니다.",
+    "student": "학생",
+    "studentDesc": "마스터를 통해 신청하여 인증서를 받으세요.",
+    "master": "마스터",
+    "masterDesc": "강사로서 기존 센터에 합류하세요.",
+    "center": "센터",
+    "centerDesc": "새로운 교육 센터를 등록하세요."
+  },
+  "status": {
+    "pending_profile": "프로필",
+    "pending_approval": "대기",
+    "approved": "승인됨",
+    "declined": "거절됨"
+  },
+  "nav": {
+    "approvals": "승인",
+    "approvalsDesc": "대기 중인 결정 사항",
+    "courses": "코스",
+    "coursesDesc": "커리큘럼 / 시간 관리",
+    "students": "학생",
+    "studentsDesc": "조회 가능한 학생",
+    "templates": "템플릿",
+    "templatesDesc": "인증서 템플릿",
+    "certificates": "인증서",
+    "certificatesDesc": "승인된 요청에 따라 인증서 발급",
+    "calendar": "캘린더",
+    "calendarDesc": "전체 이벤트 피드",
+    "revenue": "수익",
+    "revenueDesc": "승인을 통한 수익",
+    "myCertificates": "내 인증서",
+    "myCertificatesDesc": "발급된 인증서 및 대기 중인 요청",
+    "requestCertificate": "인증서 요청",
+    "requestCertificateDesc": "코스를 선택하고 승인을 위해 제출"
+  },
+  "declined": {
+    "title": "신청이 거절됨",
+    "body": "등록이 거절되었습니다. 오류라고 생각되면 센터 또는 관리자에게 문의하세요."
+  },
+  "common": {
+    "search": "검색",
+    "edit": "수정",
+    "delete": "삭제",
+    "save": "저장",
+    "cancel": "취소",
+    "submit": "제출",
+    "approve": "승인",
+    "decline": "거절",
+    "review": "검토",
+    "new": "새로 만들기"
+  },
+  "locale": {
+    "label": "언어",
+    "en": "English",
+    "kr": "한국어"
+  }
+}

@@ -1,53 +1,38 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import GoogleProvider from "next-auth/providers/google";
 
+import { env } from "~/env";
 import { db } from "~/server/db";
 import {
   accounts,
   sessions,
   users,
   verificationTokens,
+  type Locale,
+  type UserStatus,
 } from "~/server/db/schema";
 
-/**
- * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
- * object and keep type safety.
- *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- */
+export type SessionRoleKind = "admin" | "center" | "master" | "student";
+
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
+      status: UserStatus;
+      roleKind: SessionRoleKind | null;
+      roleLevel: number | null;
+      preferredLocale: Locale;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
-/**
- * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
- *
- * @see https://next-auth.js.org/configuration/options
- */
 export const authConfig = {
   providers: [
-    DiscordProvider,
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
+    GoogleProvider({
+      clientId: env.AUTH_GOOGLE_ID ?? "",
+      clientSecret: env.AUTH_GOOGLE_SECRET ?? "",
+    }),
   ],
   adapter: DrizzleAdapter(db, {
     usersTable: users,
@@ -55,13 +40,38 @@ export const authConfig = {
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    session: async ({ session, user }) => {
+      const dbUser = await db.query.users.findFirst({
+        where: (u, { eq }) => eq(u.id, user.id),
+        with: { role: true },
+      });
+
+      let roleKind: SessionRoleKind | null = null;
+      const kind = dbUser?.role?.kind;
+      if (kind === "admin" || kind === "center" || kind === "master") {
+        roleKind = kind;
+      } else {
+        const student = await db.query.studentProfiles.findFirst({
+          where: (s, { eq }) => eq(s.userId, user.id),
+        });
+        if (student) roleKind = "student";
+      }
+
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+          status: dbUser?.status ?? "pending_profile",
+          roleKind,
+          roleLevel: dbUser?.role?.level ?? null,
+          preferredLocale: dbUser?.preferredLocale ?? "en",
+        },
+      };
+    },
   },
 } satisfies NextAuthConfig;

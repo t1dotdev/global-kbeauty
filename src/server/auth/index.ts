@@ -3,8 +3,12 @@ import { cache } from "react";
 
 import { authConfig } from "./config";
 
-const { auth: uncachedAuth, handlers, signIn, signOut } = NextAuth(authConfig);
+const nextAuth = NextAuth(authConfig);
 
-const auth = cache(uncachedAuth);
+const auth = cache(nextAuth.auth);
 
-export { auth, handlers, signIn, signOut };
+// Raw (uncached) auth — used by middleware where React `cache` is unavailable.
+export const authMiddleware = nextAuth.auth;
+
+export const { handlers, signIn, signOut } = nextAuth;
+export { auth };

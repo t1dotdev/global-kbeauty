@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "Global K-Beauty",
+    "tagline": "Multi-role certification platform"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "continueWithGoogle": "Continue with Google",
+    "signedInAs": "Signed in as {email}",
+    "continue": "Continue"
+  },
+  "register": {
+    "chooseRole": "Choose your role",
+    "chooseRoleSubtitle": "Pick the role you want to register as. You can only register as one.",
+    "student": "Student",
+    "studentDesc": "Apply through your master to receive certificates.",
+    "master": "Master",
+    "masterDesc": "Join an existing center as an instructor.",
+    "center": "Center",
+    "centerDesc": "Register a new training center."
+  },
+  "status": {
+    "pending_profile": "Profile",
+    "pending_approval": "Pending",
+    "approved": "Approved",
+    "declined": "Declined"
+  },
+  "nav": {
+    "approvals": "Approvals",
+    "approvalsDesc": "Pending decisions in your queue",
+    "courses": "Courses",
+    "coursesDesc": "Manage curriculum / hours",
+    "students": "Students",
+    "studentsDesc": "Students you can see",
+    "templates": "Templates",
+    "templatesDesc": "Certificate templates",
+    "certificates": "Certificates",
+    "certificatesDesc": "Issue certificates from approved requests",
+    "calendar": "Calendar",
+    "calendarDesc": "Global event feed",
+    "revenue": "Revenue",
+    "revenueDesc": "Earnings from approvals",
+    "myCertificates": "My certificates",
+    "myCertificatesDesc": "Issued certificates and pending requests",
+    "requestCertificate": "Request a certificate",
+    "requestCertificateDesc": "Pick a course and submit for approval"
+  },
+  "declined": {
+    "title": "Application declined",
+    "body": "Your registration was declined. Please contact your center or an administrator if you believe this is a mistake."
+  },
+  "common": {
+    "search": "Search",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "approve": "Approve",
+    "decline": "Decline",
+    "review": "Review",
+    "new": "New"
+  },
+  "locale": {
+    "label": "Language",
+    "en": "English",
+    "kr": "한국어"
+  }
+}

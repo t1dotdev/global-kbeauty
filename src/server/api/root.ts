@@ -1,23 +1,40 @@
-import { postRouter } from "~/server/api/routers/post";
+import { approvalRouter } from "~/server/api/routers/approval";
+import { calendarRouter } from "~/server/api/routers/calendar";
+import { centerRouter } from "~/server/api/routers/center";
+import { certificateRouter } from "~/server/api/routers/certificate";
+import { certificateRequestRouter } from "~/server/api/routers/certificateRequest";
+import { courseRouter } from "~/server/api/routers/course";
+import { masterRouter } from "~/server/api/routers/master";
+import { revenueRouter } from "~/server/api/routers/revenue";
+import { searchRouter } from "~/server/api/routers/search";
+import { studentRouter } from "~/server/api/routers/student";
+import { systemRouter } from "~/server/api/routers/system";
+import { templateRouter } from "~/server/api/routers/template";
+import { uploadRouter } from "~/server/api/routers/upload";
+import { userRouter } from "~/server/api/routers/user";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
- * This is the primary router for your server.
- *
- * All routers added in /api/routers should be manually added here.
+ * Routers are registered as they come online per build phase.
+ * See plan.md §9 for the planned router list.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
+  system: systemRouter,
+  upload: uploadRouter,
+  center: centerRouter,
+  master: masterRouter,
+  student: studentRouter,
+  course: courseRouter,
+  approval: approvalRouter,
+  revenue: revenueRouter,
+  certificateRequest: certificateRequestRouter,
+  certificate: certificateRouter,
+  template: templateRouter,
+  calendar: calendarRouter,
+  search: searchRouter,
+  user: userRouter,
 });
 
-// export type definition of API
 export type AppRouter = typeof appRouter;
 
-/**
- * Create a server-side caller for the tRPC API.
- * @example
- * const trpc = createCaller(createContext);
- * const res = await trpc.post.all();
- *       ^? Post[]
- */
 export const createCaller = createCallerFactory(appRouter);
