@@ -24,7 +24,7 @@ export default async function CertificateSharePage(props: {
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-50 p-6">
       <div className="w-full max-w-2xl rounded-3xl border bg-white p-12 text-center shadow-sm">
-        <p className="mb-1 text-sm uppercase tracking-widest text-neutral-500">
+        <p className="mb-1 text-sm tracking-widest text-neutral-500 uppercase">
           Certificate of Completion
         </p>
         <h1 className="mb-8 text-2xl font-semibold tracking-tight">

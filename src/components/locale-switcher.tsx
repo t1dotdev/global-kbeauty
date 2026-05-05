@@ -1,14 +1,16 @@
 "use client";
 
+import { LanguagesIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+
+import { Button } from "~/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { api } from "~/trpc/react";
 
 export function LocaleSwitcher() {
@@ -18,22 +20,24 @@ export function LocaleSwitcher() {
   const set = api.user.setLocale.useMutation({
     onSuccess: () => router.refresh(),
   });
+  const setLocale = (value: "en" | "kr") => {
+    if (value !== locale) set.mutate({ locale: value });
+  };
 
   return (
-    <div className="flex items-center gap-2 text-xs text-neutral-500">
-      <span aria-label={t("label")}>{t("label")}</span>
-      <Select
-        value={locale}
-        onValueChange={(v) => v && set.mutate({ locale: v as "en" | "kr" })}
-      >
-        <SelectTrigger className="h-8 w-28">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="en">{t("en")}</SelectItem>
-          <SelectItem value="kr">{t("kr")}</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button variant="outline" size="icon" />}>
+        <LanguagesIcon className="size-4" />
+        <span className="sr-only">{t("label")}</span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-36">
+        <DropdownMenuItem onClick={() => setLocale("en")}>
+          {t("en")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setLocale("kr")}>
+          {t("kr")}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

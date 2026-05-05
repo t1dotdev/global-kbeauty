@@ -42,6 +42,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+function optionalString(value?: string) {
+  if (!value) return undefined;
+  return value;
+}
+
 export function StudentRegistrationForm() {
   const router = useRouter();
   const create = api.student.create.useMutation();
@@ -77,15 +82,15 @@ export function StudentRegistrationForm() {
     try {
       await create.mutateAsync({
         masterId: values.masterId,
-        titleEn: values.titleEn || undefined,
-        fullNameEn: values.fullNameEn || undefined,
-        idOrPassport: values.idOrPassport || undefined,
-        contentSubject: values.contentSubject || undefined,
-        academicPerformance: values.academicPerformance || undefined,
+        titleEn: optionalString(values.titleEn),
+        fullNameEn: optionalString(values.fullNameEn),
+        idOrPassport: optionalString(values.idOrPassport),
+        contentSubject: optionalString(values.contentSubject),
+        academicPerformance: optionalString(values.academicPerformance),
         completionDate: values.completionDate
           ? new Date(values.completionDate)
           : undefined,
-        notes: values.notes || undefined,
+        notes: optionalString(values.notes),
         studentIdCardUrl: idCardKey,
         paymentSlipUrl: paymentSlipKey,
         applicationUrl: applicationKey,

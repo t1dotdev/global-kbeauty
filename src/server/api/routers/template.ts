@@ -4,11 +4,9 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { certificateTemplates } from "~/server/db/schema";
+import type { DB } from "~/server/db/types";
 
-async function assertAdmin(ctx: {
-  db: typeof import("~/server/db").db;
-  session: { user: { id: string } };
-}) {
+async function assertAdmin(ctx: { db: DB; session: { user: { id: string } } }) {
   const u = await ctx.db.query.users.findFirst({
     where: (x, { eq }) => eq(x.id, ctx.session.user.id),
     with: { role: true },

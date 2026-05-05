@@ -100,7 +100,8 @@ function CourseDialog({
   const remove = api.course.delete.useMutation({ onSuccess: () => onClose() });
 
   const busy = create.isPending || update.isPending || remove.isPending;
-  const error = create.error?.message ?? update.error?.message ?? remove.error?.message;
+  const error =
+    create.error?.message ?? update.error?.message ?? remove.error?.message;
 
   return (
     <Dialog open onOpenChange={(o) => (!o ? onClose() : null)}>

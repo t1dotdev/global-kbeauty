@@ -3,11 +3,9 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { buildStudentPipeline } from "~/server/api/approval/pipeline";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { studentProfiles, users } from "~/server/db/schema";
+import type { DB } from "~/server/db/types";
 
 const fileKey = z.string().max(1024).nullable().optional();
 
@@ -37,10 +35,7 @@ export const studentCreateInput = z.object({
   notes: z.string().max(2000).optional(),
 });
 
-async function loadActor(ctx: {
-  db: typeof import("~/server/db").db;
-  session: { user: { id: string } };
-}) {
+async function loadActor(ctx: { db: DB; session: { user: { id: string } } }) {
   const user = await ctx.db.query.users.findFirst({
     where: (u, { eq }) => eq(u.id, ctx.session.user.id),
     with: { role: true },
@@ -232,7 +227,7 @@ export const studentRouter = createTRPCRouter({
       const master = await ctx.db.query.masterProfiles.findFirst({
         where: (t, { eq }) => eq(t.id, input.masterId),
       });
-      if (!master || master.status !== "approved") {
+      if (master?.status !== "approved") {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Selected master is not available.",

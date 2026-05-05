@@ -134,10 +134,7 @@ function EventDialog({
         <div className="grid gap-4">
           <div className="grid gap-2">
             <Label>Title</Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">

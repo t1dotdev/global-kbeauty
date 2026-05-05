@@ -16,11 +16,7 @@ import { api, type RouterOutputs } from "~/trpc/react";
 
 type Student = RouterOutputs["student"]["list"][number];
 
-export function StudentsTable({
-  canEdit = false,
-}: {
-  canEdit?: boolean;
-}) {
+export function StudentsTable({ canEdit = false }: { canEdit?: boolean }) {
   const [search, setSearch] = useState("");
   const list = api.student.list.useQuery({ search: search || undefined });
   const utils = api.useUtils();
@@ -46,7 +42,9 @@ export function StudentsTable({
             <TableHead>Name</TableHead>
             <TableHead>ID / Passport</TableHead>
             <TableHead>Status</TableHead>
-            {canEdit ? <TableHead className="text-right">Actions</TableHead> : null}
+            {canEdit ? (
+              <TableHead className="text-right">Actions</TableHead>
+            ) : null}
           </TableRow>
         </TableHeader>
         <TableBody>

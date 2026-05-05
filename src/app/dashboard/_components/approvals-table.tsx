@@ -63,8 +63,7 @@ export function ApprovalsTable() {
               <TableCell>{describeTarget(item)}</TableCell>
               <TableCell>
                 <span className="text-xs text-neutral-500">
-                  Step {item.step.orderIndex + 1} ·{" "}
-                  {item.step.requiredKind}
+                  Step {item.step.orderIndex + 1} · {item.step.requiredKind}
                   {item.step.requiredRoleLevel != null
                     ? ` Lv ${item.step.requiredRoleLevel}`
                     : ""}
@@ -100,7 +99,8 @@ function describeTarget(item: QueueItem) {
     const t = item.target;
     if (!t) return item.step.targetId;
     const name = [t.firstNameEn, t.lastNameEn].filter(Boolean).join(" ");
-    return `${name || t.masterCode || t.id} (Lv ${t.currentLevel})`;
+    const label = name ? name : (t.masterCode ?? t.id);
+    return `${label} (Lv ${t.currentLevel})`;
   }
   if (item.kind === "student") {
     return item.target?.fullNameEn ?? item.step.targetId;

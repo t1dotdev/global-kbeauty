@@ -2,9 +2,9 @@ import { TemplatesAdmin } from "./templates-admin";
 
 export default function AdminTemplatesPage() {
   return (
-    <main className="mx-auto max-w-5xl p-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">
+    <main className="w-full p-8">
+      <header className="mb-4">
+        <h1 className="text-xl font-semibold tracking-tight">
           Certificate templates
         </h1>
         <p className="text-sm text-neutral-500">

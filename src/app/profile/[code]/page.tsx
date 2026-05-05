@@ -17,7 +17,7 @@ export default async function ProfilePage(props: {
   return (
     <main className="mx-auto max-w-3xl p-8">
       <header className="mb-6">
-        <p className="text-xs uppercase tracking-widest text-neutral-500">
+        <p className="text-xs tracking-widest text-neutral-500 uppercase">
           {result.kind} profile
         </p>
         <h1 className="text-2xl font-semibold tracking-tight">{code}</h1>

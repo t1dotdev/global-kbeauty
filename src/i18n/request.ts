@@ -1,4 +1,6 @@
 import { getRequestConfig } from "next-intl/server";
+import enMessages from "~/i18n/messages/en.json";
+import krMessages from "~/i18n/messages/kr.json";
 import { auth } from "~/server/auth";
 
 export const locales = ["en", "kr"] as const;
@@ -11,8 +13,7 @@ export default getRequestConfig(async () => {
   const locale: Locale =
     fromSession === "kr" || fromSession === "en" ? fromSession : defaultLocale;
 
-  const messages = (await import(`./messages/${locale}.json`)).default as
-    | Record<string, unknown>;
+  const messages = locale === "kr" ? krMessages : enMessages;
 
   return { locale, messages };
 });

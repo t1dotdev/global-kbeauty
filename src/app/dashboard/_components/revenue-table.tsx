@@ -35,19 +35,14 @@ export function RevenueTable() {
           <TableBody>
             {ledger.data?.length === 0 && (
               <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-center text-neutral-500"
-                >
+                <TableCell colSpan={3} className="text-center text-neutral-500">
                   No earnings yet.
                 </TableCell>
               </TableRow>
             )}
             {ledger.data?.map((row) => (
               <TableRow key={row.id}>
-                <TableCell>
-                  {row.createdAt.toLocaleString()}
-                </TableCell>
+                <TableCell>{row.createdAt.toLocaleString()}</TableCell>
                 <TableCell className="capitalize">{row.sourceType}</TableCell>
                 <TableCell className="text-right">{row.amountThb}</TableCell>
               </TableRow>

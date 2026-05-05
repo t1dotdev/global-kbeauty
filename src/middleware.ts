@@ -1,5 +1,8 @@
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import { authMiddleware } from "~/server/auth";
+import { authEdgeConfig } from "~/server/auth/config.edge";
+
+const { auth: authMiddleware } = NextAuth(authEdgeConfig);
 
 const PUBLIC_PATHS = ["/", "/login"];
 const PUBLIC_PREFIXES = ["/certificate/", "/api/", "/_next/", "/favicon"];

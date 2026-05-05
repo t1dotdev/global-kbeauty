@@ -11,9 +11,10 @@ async function ensureRole(input: {
   amountThb?: string;
 }) {
   const existing = await db.query.roles.findFirst({
-    where: input.level === null
-      ? and(eq(roles.kind, input.kind), isNull(roles.level))
-      : and(eq(roles.kind, input.kind), eq(roles.level, input.level)),
+    where:
+      input.level === null
+        ? and(eq(roles.kind, input.kind), isNull(roles.level))
+        : and(eq(roles.kind, input.kind), eq(roles.level, input.level)),
   });
   if (existing) return existing;
   const [created] = await db

@@ -7,8 +7,5 @@ const nextAuth = NextAuth(authConfig);
 
 const auth = cache(nextAuth.auth);
 
-// Raw (uncached) auth — used by middleware where React `cache` is unavailable.
-export const authMiddleware = nextAuth.auth;
-
 export const { handlers, signIn, signOut } = nextAuth;
 export { auth };

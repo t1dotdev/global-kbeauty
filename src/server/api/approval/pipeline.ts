@@ -1,11 +1,13 @@
 import {
   approvalSteps,
+  type ApprovalStepStatus,
   type ApprovalTargetType,
   type RoleKind,
 } from "~/server/db/schema";
-import { db } from "~/server/db";
+import type { Tx } from "~/server/db/types";
 
-type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+const firstStepStatus: ApprovalStepStatus = "active";
+const laterStepStatus: ApprovalStepStatus = "waiting";
 
 type StepInput = {
   requiredKind: RoleKind;
@@ -29,7 +31,7 @@ async function insertSteps(
     requiredRoleLevel: s.requiredRoleLevel,
     requiredCenterId: s.requiredCenterId,
     assignedUserId: s.assignedUserId ?? null,
-    status: (i === 0 ? "active" : "waiting") as "active" | "waiting",
+    status: i === 0 ? firstStepStatus : laterStepStatus,
   }));
   await tx.insert(approvalSteps).values(rows);
   return rows;

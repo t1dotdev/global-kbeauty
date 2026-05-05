@@ -65,7 +65,7 @@ export function FileUpload({
       <div className="flex items-center gap-3">
         <label
           className={cn(
-            "inline-flex h-9 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs transition hover:bg-accent",
+            "border-input bg-background hover:bg-accent inline-flex h-9 cursor-pointer items-center justify-center rounded-md border px-3 text-sm font-medium shadow-xs transition",
             busy && "pointer-events-none opacity-60",
           )}
         >
@@ -83,7 +83,9 @@ export function FileUpload({
         </label>
         {value ? (
           <div className="flex items-center gap-2 text-sm text-neutral-600">
-            <span className="max-w-[260px] truncate">{value.split("/").pop()}</span>
+            <span className="max-w-[260px] truncate">
+              {value.split("/").pop()}
+            </span>
             <button
               type="button"
               className="text-xs text-red-600 hover:underline"

@@ -16,7 +16,7 @@ export const searchRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const code = input.code.toUpperCase().trim();
       const kind = classifyCode(code);
-      if (!kind) return { kind: null as null, target: null };
+      if (!kind) return { kind: null, target: null };
 
       if (kind === "center") {
         const c = await ctx.db.query.centers.findFirst({
@@ -42,8 +42,7 @@ export const searchRouter = createTRPCRouter({
       const q = `%${input.q}%`;
       const [centers, masters, students] = await Promise.all([
         ctx.db.query.centers.findMany({
-          where: (t, { or, ilike }) =>
-            or(ilike(t.name, q), ilike(t.code, q)),
+          where: (t, { or, ilike }) => or(ilike(t.name, q), ilike(t.code, q)),
           limit: 10,
           columns: { id: true, code: true, name: true },
         }),

@@ -5,7 +5,6 @@ import {
   primaryKey,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { type AdapterAccount } from "next-auth/adapters";
 
 export const createTable = pgTableCreator((name) => `global-kbeauty_${name}`);
 
@@ -25,6 +24,7 @@ export type ApprovalTargetType =
   | "center"
   | "student"
   | "cert_request";
+type AdapterAccountType = "email" | "oauth" | "oidc" | "webauthn";
 export type ApprovalStepStatus =
   | "waiting"
   | "active"
@@ -124,7 +124,7 @@ export const accounts = createTable(
       .varchar({ length: 255 })
       .notNull()
       .references(() => users.id),
-    type: d.varchar({ length: 255 }).$type<AdapterAccount["type"]>().notNull(),
+    type: d.varchar({ length: 255 }).$type<AdapterAccountType>().notNull(),
     provider: d.varchar({ length: 255 }).notNull(),
     providerAccountId: d.varchar({ length: 255 }).notNull(),
     refresh_token: d.text(),
@@ -330,6 +330,12 @@ export const courses = createTable(
   (t) => [index("course_name_idx").on(t.name)],
 );
 
+export const coursesRelations = relations(courses, ({ many }) => ({
+  students: many(studentProfiles),
+  certificateRequests: many(certificateRequests),
+  certificates: many(certificates),
+}));
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Student profile
 // ─────────────────────────────────────────────────────────────────────────────
@@ -426,20 +432,26 @@ export const studentProfilesRelations = relations(
 // Certificate request + Certificate + Template
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const certificateTemplates = createTable("certificate_template", (d) => ({
-  id: d
-    .varchar({ length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: d.varchar({ length: 255 }).notNull(),
-  definition: d.jsonb().notNull().default(sql`'{}'::jsonb`),
-  createdAt: d
-    .timestamp({ withTimezone: true })
-    .$defaultFn(() => new Date())
-    .notNull(),
-  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-}));
+export const certificateTemplates = createTable(
+  "certificate_template",
+  (d) => ({
+    id: d
+      .varchar({ length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    name: d.varchar({ length: 255 }).notNull(),
+    definition: d
+      .jsonb()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .$defaultFn(() => new Date())
+      .notNull(),
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+);
 
 export const certificateRequests = createTable(
   "certificate_request",
@@ -457,7 +469,10 @@ export const certificateRequests = createTable(
       .varchar({ length: 255 })
       .notNull()
       .references(() => courses.id),
-    payload: d.jsonb().notNull().default(sql`'{}'::jsonb`),
+    payload: d
+      .jsonb()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     status: d
       .varchar({ length: 32 })
       .$type<EntityStatus>()
@@ -518,6 +533,51 @@ export const certificates = createTable(
   ],
 );
 
+export const certificateTemplatesRelations = relations(
+  certificateTemplates,
+  ({ many }) => ({
+    certificates: many(certificates),
+  }),
+);
+
+export const certificateRequestsRelations = relations(
+  certificateRequests,
+  ({ one, many }) => ({
+    student: one(studentProfiles, {
+      fields: [certificateRequests.studentId],
+      references: [studentProfiles.id],
+    }),
+    course: one(courses, {
+      fields: [certificateRequests.courseId],
+      references: [courses.id],
+    }),
+    certificates: many(certificates),
+  }),
+);
+
+export const certificatesRelations = relations(certificates, ({ one }) => ({
+  student: one(studentProfiles, {
+    fields: [certificates.studentId],
+    references: [studentProfiles.id],
+  }),
+  course: one(courses, {
+    fields: [certificates.courseId],
+    references: [courses.id],
+  }),
+  request: one(certificateRequests, {
+    fields: [certificates.requestId],
+    references: [certificateRequests.id],
+  }),
+  template: one(certificateTemplates, {
+    fields: [certificates.templateId],
+    references: [certificateTemplates.id],
+  }),
+  issuedBy: one(users, {
+    fields: [certificates.issuedByUserId],
+    references: [users.id],
+  }),
+}));
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Approval engine
 // ─────────────────────────────────────────────────────────────────────────────
@@ -530,23 +590,14 @@ export const approvalSteps = createTable(
       .notNull()
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
-    targetType: d
-      .varchar({ length: 32 })
-      .$type<ApprovalTargetType>()
-      .notNull(),
+    targetType: d.varchar({ length: 32 }).$type<ApprovalTargetType>().notNull(),
     targetId: d.varchar({ length: 255 }).notNull(),
     orderIndex: d.integer().notNull(),
     requiredRoleLevel: d.integer(),
     requiredKind: d.varchar({ length: 16 }).$type<RoleKind>().notNull(),
-    requiredCenterId: d
-      .varchar({ length: 255 })
-      .references(() => centers.id),
-    assignedUserId: d
-      .varchar({ length: 255 })
-      .references(() => users.id),
-    decidedByUserId: d
-      .varchar({ length: 255 })
-      .references(() => users.id),
+    requiredCenterId: d.varchar({ length: 255 }).references(() => centers.id),
+    assignedUserId: d.varchar({ length: 255 }).references(() => users.id),
+    decidedByUserId: d.varchar({ length: 255 }).references(() => users.id),
     status: d
       .varchar({ length: 16 })
       .$type<ApprovalStepStatus>()

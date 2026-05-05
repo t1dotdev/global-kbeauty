@@ -1,41 +1,36 @@
 import Link from "next/link";
-import { auth, signOut } from "~/server/auth";
+import { getTranslations } from "next-intl/server";
+import { auth } from "~/server/auth";
 
 export default async function StudentDashboardPage() {
   const session = await auth();
+  const t = await getTranslations();
   const status = session?.user?.status;
   return (
-    <main className="mx-auto max-w-5xl p-8">
-      <header className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Student</h1>
-        <form
-          action={async () => {
-            "use server";
-            await signOut({ redirectTo: "/" });
-          }}
-        >
-          <button className="rounded-lg border px-3 py-1.5 text-sm hover:bg-neutral-50">
-            Sign out
-          </button>
-        </form>
+    <main className="w-full p-8">
+      <header className="mb-4">
+        <h1 className="text-xl font-semibold tracking-tight">
+          {t("register.student")}
+        </h1>
+        <p className="text-muted-foreground text-sm">{t("app.tagline")}</p>
       </header>
 
       {status === "pending_approval" ? (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-          Your registration is pending approval from your master.
+          {t("status.pending_approval")}
         </div>
       ) : null}
 
       <nav className="grid gap-3 sm:grid-cols-2">
         <NavCard
           href="/dashboard/student/certificates"
-          title="My certificates"
-          desc="Issued certificates and pending requests"
+          title={t("nav.myCertificates")}
+          desc={t("nav.myCertificatesDesc")}
         />
         <NavCard
           href="/dashboard/student/request"
-          title="Request a certificate"
-          desc="Pick a course and submit for approval"
+          title={t("nav.requestCertificate")}
+          desc={t("nav.requestCertificateDesc")}
         />
       </nav>
     </main>
@@ -54,10 +49,10 @@ function NavCard({
   return (
     <Link
       href={href}
-      className="rounded-2xl border bg-white p-5 shadow-sm transition hover:border-neutral-900 hover:shadow"
+      className="bg-card text-card-foreground hover:border-primary rounded-2xl border p-5 shadow-sm transition hover:shadow"
     >
       <div className="text-base font-semibold">{title}</div>
-      <div className="text-sm text-neutral-500">{desc}</div>
+      <div className="text-muted-foreground text-sm">{desc}</div>
     </Link>
   );
 }

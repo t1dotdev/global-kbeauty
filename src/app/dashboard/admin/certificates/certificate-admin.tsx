@@ -57,10 +57,7 @@ export function CertificateAdmin() {
           <TableBody>
             {approved.data?.length === 0 && (
               <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-center text-neutral-500"
-                >
+                <TableCell colSpan={3} className="text-center text-neutral-500">
                   Nothing waiting.
                 </TableCell>
               </TableRow>
@@ -99,10 +96,7 @@ export function CertificateAdmin() {
           <TableBody>
             {issued.data?.length === 0 && (
               <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-center text-neutral-500"
-                >
+                <TableCell colSpan={3} className="text-center text-neutral-500">
                   None yet.
                 </TableCell>
               </TableRow>
@@ -189,9 +183,7 @@ function IssueDialog({
         <DialogFooter>
           <Button
             disabled={!templateId || issue.isPending}
-            onClick={() =>
-              issue.mutate({ requestId: request.id, templateId })
-            }
+            onClick={() => issue.mutate({ requestId: request.id, templateId })}
           >
             {issue.isPending ? "Generating PDF…" : "Issue"}
           </Button>

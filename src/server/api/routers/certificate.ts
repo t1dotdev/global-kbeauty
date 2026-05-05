@@ -1,25 +1,25 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { env } from "~/env";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import {
   certificateRequests,
-  certificateTemplates,
   certificates,
   centers,
   courses,
   masterProfiles,
   studentProfiles,
 } from "~/server/db/schema";
+import type { DB } from "~/server/db/types";
 import { renderCertificatePdf } from "~/server/storage/certificate-pdf";
 import { presignDownload, putObject } from "~/server/storage/r2";
 
-async function assertAdmin(ctx: {
-  db: typeof import("~/server/db").db;
-  session: { user: { id: string } };
-}) {
+async function assertAdmin(ctx: { db: DB; session: { user: { id: string } } }) {
   const u = await ctx.db.query.users.findFirst({
     where: (x, { eq }) => eq(x.id, ctx.session.user.id),
     with: { role: true },
@@ -40,11 +40,7 @@ function randomToken(length = 24) {
 
 export const certificateRouter = createTRPCRouter({
   list: protectedProcedure
-    .input(
-      z
-        .object({ studentId: z.string().optional() })
-        .default({}),
-    )
+    .input(z.object({ studentId: z.string().optional() }).default({}))
     .query(async ({ ctx, input }) => {
       return ctx.db.query.certificates.findMany({
         where: (t, { eq }) =>
@@ -86,7 +82,12 @@ export const certificateRouter = createTRPCRouter({
       const [student, course] = await Promise.all([
         ctx.db.query.studentProfiles.findFirst({
           where: (s, { eq }) => eq(s.id, cert.studentId),
-          columns: { fullNameEn: true, studentCode: true, centerId: true, masterId: true },
+          columns: {
+            fullNameEn: true,
+            studentCode: true,
+            centerId: true,
+            masterId: true,
+          },
         }),
         ctx.db.query.courses.findFirst({
           where: (c, { eq }) => eq(c.id, cert.courseId),
@@ -187,9 +188,8 @@ export const certificateRouter = createTRPCRouter({
         centerName: center?.name ?? null,
         centerCode: center?.code ?? null,
         masterName: master
-          ? [master.firstNameEn, master.lastNameEn]
-              .filter(Boolean)
-              .join(" ") || null
+          ? [master.firstNameEn, master.lastNameEn].filter(Boolean).join(" ") ||
+            null
           : null,
         masterCode: master?.masterCode ?? null,
         issuedAt: new Date(),

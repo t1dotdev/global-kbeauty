@@ -1,10 +1,11 @@
 import { TRPCError } from "@trpc/server";
-import { and, asc, eq, inArray, isNull, lte, or } from "drizzle-orm";
+import { and, asc, eq, inArray, lte, or } from "drizzle-orm";
 import { z } from "zod";
 
 import {
   centerCode,
   nextMasterCode,
+  nextStudentCode,
 } from "~/server/api/approval/identifiers";
 import {
   markCertRequestApproved,
@@ -14,19 +15,17 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import {
   approvalSteps,
   centers,
-  certificateRequests,
   masterProfiles,
   revenueLedger,
-  roles,
   studentProfiles,
   users,
-  type ApprovalTargetType,
 } from "~/server/db/schema";
+import type { DB, Tx } from "~/server/db/types";
 
 type SessionRoleKind = "admin" | "center" | "master" | "student";
 
 async function loadActor(ctx: {
-  db: typeof import("~/server/db").db;
+  db: DB;
   session: { user: { id: string; roleKind: SessionRoleKind | null } };
 }) {
   const userId = ctx.session.user.id;
@@ -102,11 +101,8 @@ function buildVisibilityFilter(actor: {
   return or(...orParts)!;
 }
 
-async function enrichStep(
-  db: typeof import("~/server/db").db,
-  step: typeof approvalSteps.$inferSelect,
-) {
-  const t = step.targetType as ApprovalTargetType;
+async function enrichStep(db: DB, step: typeof approvalSteps.$inferSelect) {
+  const t = step.targetType;
   if (t === "center") {
     const c = await db.query.centers.findFirst({
       where: (x, { eq }) => eq(x.id, step.targetId),
@@ -159,9 +155,12 @@ export const approvalRouter = createTRPCRouter({
     if (!actor.kind && !actor.master) return [];
 
     const visibility = buildVisibilityFilter({
-      kind: actor.kind === "admin" || actor.kind === "center" || actor.kind === "master"
-        ? actor.kind
-        : null,
+      kind:
+        actor.kind === "admin" ||
+        actor.kind === "center" ||
+        actor.kind === "master"
+          ? actor.kind
+          : null,
       level: actor.level,
       center: actor.center ?? null,
       master: actor.master ?? null,
@@ -193,7 +192,10 @@ export const approvalRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const rows = await ctx.db.query.approvalSteps.findMany({
         where: (t, { eq, and }) =>
-          and(eq(t.targetType, input.targetType), eq(t.targetId, input.targetId)),
+          and(
+            eq(t.targetType, input.targetType),
+            eq(t.targetId, input.targetId),
+          ),
         orderBy: (t, { asc }) => [asc(t.orderIndex)],
       });
       return rows;
@@ -303,7 +305,7 @@ export const approvalRouter = createTRPCRouter({
 });
 
 async function skipRemainingSteps(
-  tx: Parameters<Parameters<typeof import("~/server/db").db.transaction>[0]>[0],
+  tx: Tx,
   step: typeof approvalSteps.$inferSelect,
 ) {
   const remaining = await tx
@@ -329,7 +331,7 @@ async function skipRemainingSteps(
 }
 
 async function markTargetDeclined(
-  tx: Parameters<Parameters<typeof import("~/server/db").db.transaction>[0]>[0],
+  tx: Tx,
   step: typeof approvalSteps.$inferSelect,
 ) {
   if (step.targetType === "center") {
@@ -380,7 +382,7 @@ async function markTargetDeclined(
 }
 
 async function finalizeApproval(
-  tx: Parameters<Parameters<typeof import("~/server/db").db.transaction>[0]>[0],
+  tx: Tx,
   step: typeof approvalSteps.$inferSelect,
   centerCodeSuffix?: string,
 ) {
@@ -450,9 +452,6 @@ async function finalizeApproval(
       where: (x, { eq }) => eq(x.id, s.masterId),
     });
     if (!m?.masterCode) return;
-    const { nextStudentCode } = await import(
-      "~/server/api/approval/identifiers"
-    );
     const code = await nextStudentCode(tx, m.masterCode);
     await tx
       .update(studentProfiles)
@@ -466,7 +465,4 @@ async function finalizeApproval(
   if (step.targetType === "cert_request") {
     await markCertRequestApproved(tx, step.targetId);
   }
-  void roles;
-  void isNull;
-  void certificateRequests;
 }

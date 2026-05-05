@@ -79,7 +79,7 @@ export const masterRouter = createTRPCRouter({
       const center = await ctx.db.query.centers.findFirst({
         where: (t, { eq }) => eq(t.id, input.centerId),
       });
-      if (!center || center.status !== "approved") {
+      if (center?.status !== "approved") {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Selected center is not available.",

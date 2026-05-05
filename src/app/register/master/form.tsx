@@ -46,6 +46,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+function optionalString(value?: string) {
+  if (!value) return undefined;
+  return value;
+}
+
 export function MasterRegistrationForm() {
   const router = useRouter();
   const create = api.master.create.useMutation();
@@ -78,15 +83,15 @@ export function MasterRegistrationForm() {
       await create.mutateAsync({
         centerId: values.centerId,
         desiredLevel: Number(values.desiredLevel),
-        titleTh: values.titleTh || undefined,
-        firstNameTh: values.firstNameTh || undefined,
-        lastNameTh: values.lastNameTh || undefined,
-        titleEn: values.titleEn || undefined,
-        firstNameEn: values.firstNameEn || undefined,
-        lastNameEn: values.lastNameEn || undefined,
-        idCardNumber: values.idCardNumber || undefined,
-        completedCourse: values.completedCourse || undefined,
-        completedCourseOther: values.completedCourseOther || undefined,
+        titleTh: optionalString(values.titleTh),
+        firstNameTh: optionalString(values.firstNameTh),
+        lastNameTh: optionalString(values.lastNameTh),
+        titleEn: optionalString(values.titleEn),
+        firstNameEn: optionalString(values.firstNameEn),
+        lastNameEn: optionalString(values.lastNameEn),
+        idCardNumber: optionalString(values.idCardNumber),
+        completedCourse: optionalString(values.completedCourse),
+        completedCourseOther: optionalString(values.completedCourseOther),
         certificateRequestDate: values.certificateRequestDate
           ? new Date(values.certificateRequestDate)
           : undefined,

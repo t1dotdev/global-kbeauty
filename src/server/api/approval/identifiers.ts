@@ -32,8 +32,8 @@ export async function nextMasterCode(
   let max = 0;
   for (const row of existing) {
     if (!row.code) continue;
-    const m = row.code.match(/M\d{2}(\d{3,})$/);
-    if (m && m[1]) {
+    const m = /M\d{2}(\d{3,})$/.exec(row.code);
+    if (m?.[1]) {
       const n = parseInt(m[1], 10);
       if (n > max) max = n;
     }
@@ -56,8 +56,8 @@ export async function nextStudentCode(
   let max = 0;
   for (const row of rows) {
     if (!row.code) continue;
-    const m = row.code.match(/-S(\d{3,})$/);
-    if (m && m[1]) {
+    const m = /-S(\d{3,})$/.exec(row.code);
+    if (m?.[1]) {
       const n = parseInt(m[1], 10);
       if (n > max) max = n;
     }

@@ -35,6 +35,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+function optionalString(value?: string) {
+  if (!value) return undefined;
+  return value;
+}
+
 export function CenterRegistrationForm() {
   const router = useRouter();
   const create = api.center.create.useMutation();
@@ -62,17 +67,23 @@ export function CenterRegistrationForm() {
     try {
       await create.mutateAsync({
         name: values.name,
-        address: values.address || undefined,
-        directorTitle: values.directorTitle || undefined,
-        directorName: values.directorName || undefined,
-        directorIdCard: values.directorIdCard || undefined,
+        address: optionalString(values.address),
+        directorTitle: optionalString(values.directorTitle),
+        directorName: optionalString(values.directorName),
+        directorIdCard: optionalString(values.directorIdCard),
         vocationalFields: values.vocationalFields
-          ? values.vocationalFields.split(",").map((s) => s.trim()).filter(Boolean)
+          ? values.vocationalFields
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
           : [],
         contents: values.contents
-          ? values.contents.split("\n").map((s) => s.trim()).filter(Boolean)
+          ? values.contents
+              .split("\n")
+              .map((s) => s.trim())
+              .filter(Boolean)
           : [],
-        appointmentNumber: values.appointmentNumber || undefined,
+        appointmentNumber: optionalString(values.appointmentNumber),
         appointmentDate: values.appointmentDate
           ? new Date(values.appointmentDate)
           : undefined,
@@ -191,11 +202,7 @@ export function CenterRegistrationForm() {
               <FormItem>
                 <FormLabel>Course contents</FormLabel>
                 <FormControl>
-                  <Textarea
-                    {...field}
-                    rows={4}
-                    placeholder="One per line"
-                  />
+                  <Textarea {...field} rows={4} placeholder="One per line" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

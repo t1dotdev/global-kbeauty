@@ -4,11 +4,9 @@ import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { courses } from "~/server/db/schema";
+import type { DB } from "~/server/db/types";
 
-async function assertAdmin(ctx: {
-  db: typeof import("~/server/db").db;
-  session: { user: { id: string } };
-}) {
+async function assertAdmin(ctx: { db: DB; session: { user: { id: string } } }) {
   const user = await ctx.db.query.users.findFirst({
     where: (u, { eq }) => eq(u.id, ctx.session.user.id),
     with: { role: true },
@@ -45,10 +43,7 @@ export const courseRouter = createTRPCRouter({
     .input(courseInput)
     .mutation(async ({ ctx, input }) => {
       await assertAdmin(ctx);
-      const [created] = await ctx.db
-        .insert(courses)
-        .values(input)
-        .returning();
+      const [created] = await ctx.db.insert(courses).values(input).returning();
       return created;
     }),
 

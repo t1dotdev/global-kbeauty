@@ -4,10 +4,8 @@ import { z } from "zod";
 
 import { buildCertRequestPipeline } from "~/server/api/approval/pipeline";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import {
-  certificateRequests,
-  studentProfiles,
-} from "~/server/db/schema";
+import { certificateRequests } from "~/server/db/schema";
+import type { Tx } from "~/server/db/types";
 
 export const certificateRequestRouter = createTRPCRouter({
   myRequests: protectedProcedure.query(async ({ ctx }) => {
@@ -122,23 +120,16 @@ export const certificateRequestRouter = createTRPCRouter({
 });
 
 // Helper exposed for the approval finalizer to update request status
-export async function markCertRequestApproved(
-  tx: Parameters<Parameters<typeof import("~/server/db").db.transaction>[0]>[0],
-  requestId: string,
-) {
+export async function markCertRequestApproved(tx: Tx, requestId: string) {
   await tx
     .update(certificateRequests)
     .set({ status: "approved" })
     .where(eq(certificateRequests.id, requestId));
 }
 
-export async function markCertRequestDeclined(
-  tx: Parameters<Parameters<typeof import("~/server/db").db.transaction>[0]>[0],
-  requestId: string,
-) {
+export async function markCertRequestDeclined(tx: Tx, requestId: string) {
   await tx
     .update(certificateRequests)
     .set({ status: "declined" })
     .where(eq(certificateRequests.id, requestId));
-  void studentProfiles;
 }
