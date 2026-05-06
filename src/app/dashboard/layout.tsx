@@ -163,8 +163,9 @@ function getDashboardItems(
   const roleItems: Record<SessionRoleKind, DashboardSidebarItem[]> = {
     admin: [
       item("approvals", root, t),
+      item("roles", root, t),
+      item("users", root, t),
       item("courses", root, t),
-      item("students", root, t),
       item("templates", root, t),
       item("certificates", root, t),
       item("calendar", root, t),
@@ -203,8 +204,10 @@ function item(
     myCertificates: "certificates",
     requestCertificate: "request",
     revenue: "revenue",
+    roles: "roles",
     students: "students",
     templates: "templates",
+    users: "users",
   };
 
   return {

@@ -12,6 +12,7 @@ import {
   FileText,
   Home,
   Send,
+  ShieldCheck,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -40,8 +41,10 @@ export type DashboardSidebarItem = {
     | "overview"
     | "requestCertificate"
     | "revenue"
+    | "roles"
     | "students"
-    | "templates";
+    | "templates"
+    | "users";
   title: string;
   description: string;
   href: string;
@@ -56,8 +59,10 @@ const icons = {
   overview: Home,
   requestCertificate: Send,
   revenue: ChartNoAxesColumnIncreasing,
+  roles: ShieldCheck,
   students: Users,
   templates: FileText,
+  users: Users,
 };
 
 export function DashboardSidebar({

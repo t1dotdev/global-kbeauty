@@ -16,14 +16,29 @@ export default async function AdminDashboardPage() {
           desc={t("nav.approvalsDesc")}
         />
         <NavCard
+          href="/dashboard/admin/roles"
+          title={t("nav.roles")}
+          desc={t("nav.rolesDesc")}
+        />
+        <NavCard
           href="/dashboard/admin/courses"
           title={t("nav.courses")}
           desc={t("nav.coursesDesc")}
         />
         <NavCard
-          href="/dashboard/admin/students"
-          title={t("nav.students")}
-          desc={t("nav.studentsDesc")}
+          href="/dashboard/admin/roles"
+          title={t("nav.roles")}
+          desc={t("nav.rolesDesc")}
+        />
+        <NavCard
+          href="/dashboard/admin/courses"
+          title={t("nav.courses")}
+          desc={t("nav.coursesDesc")}
+        />
+        <NavCard
+          href="/dashboard/admin/users"
+          title={t("nav.users")}
+          desc={t("nav.usersDesc")}
         />
         <NavCard
           href="/dashboard/admin/templates"

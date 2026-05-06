@@ -1,3 +1,4 @@
+import { adminUserRouter } from "~/server/api/routers/adminUser";
 import { approvalRouter } from "~/server/api/routers/approval";
 import { calendarRouter } from "~/server/api/routers/calendar";
 import { centerRouter } from "~/server/api/routers/center";
@@ -6,6 +7,7 @@ import { certificateRequestRouter } from "~/server/api/routers/certificateReques
 import { courseRouter } from "~/server/api/routers/course";
 import { masterRouter } from "~/server/api/routers/master";
 import { revenueRouter } from "~/server/api/routers/revenue";
+import { roleRouter } from "~/server/api/routers/role";
 import { searchRouter } from "~/server/api/routers/search";
 import { studentRouter } from "~/server/api/routers/student";
 import { systemRouter } from "~/server/api/routers/system";
@@ -27,12 +29,14 @@ export const appRouter = createTRPCRouter({
   course: courseRouter,
   approval: approvalRouter,
   revenue: revenueRouter,
+  role: roleRouter,
   certificateRequest: certificateRequestRouter,
   certificate: certificateRouter,
   template: templateRouter,
   calendar: calendarRouter,
   search: searchRouter,
   user: userRouter,
+  adminUser: adminUserRouter,
 });
 
 export type AppRouter = typeof appRouter;
