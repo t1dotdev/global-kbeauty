@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
 import { auth, signIn } from "~/server/auth";
 
 export default async function LoginPage(props: {
@@ -13,36 +15,39 @@ export default async function LoginPage(props: {
   const t = await getTranslations();
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-neutral-50">
-      <div className="w-full max-w-sm rounded-2xl border bg-white p-8 shadow-sm">
-        <div className="mb-6 flex justify-center">
-          <Image
-            src="/logo.png"
-            alt={t("app.name")}
-            width={160}
-            height={178}
-            priority
-            className="h-auto w-40"
-          />
-        </div>
-        <p className="mb-8 text-center text-sm text-neutral-500">
-          {t("app.tagline")}
-        </p>
-        <form
-          action={async () => {
-            "use server";
-            await signIn("google", { redirectTo: callbackUrl ?? "/" });
-          }}
-        >
-          <button
-            type="submit"
-            className="flex w-full items-center justify-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 shadow-sm transition hover:bg-neutral-50"
+    <main className="flex flex-1 items-center justify-center p-6">
+      <Card className="w-full max-w-sm">
+        <CardContent className="grid gap-6">
+          <div className="flex justify-center">
+            <Image
+              src="/logo.png"
+              alt={t("app.name")}
+              width={160}
+              height={178}
+              priority
+              className="h-auto w-40"
+            />
+          </div>
+          <p className="text-muted-foreground text-center text-sm">
+            {t("app.tagline")}
+          </p>
+          <form
+            action={async () => {
+              "use server";
+              await signIn("google", { redirectTo: callbackUrl ?? "/" });
+            }}
           >
-            <GoogleIcon />
-            {t("auth.continueWithGoogle")}
-          </button>
-        </form>
-      </div>
+            <Button
+              type="submit"
+              variant="outline"
+              className="w-full gap-3"
+            >
+              <GoogleIcon />
+              {t("auth.continueWithGoogle")}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   );
 }

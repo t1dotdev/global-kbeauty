@@ -10,6 +10,12 @@ import { z } from "zod";
 import { FileUpload } from "~/components/file-upload";
 import { Button } from "~/components/ui/button";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
   Form,
   FormControl,
   FormField,
@@ -112,8 +118,11 @@ export function MasterRegistrationForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Center & level</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Center & level</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <FormField
             control={form.control}
             name="centerId"
@@ -163,10 +172,14 @@ export function MasterRegistrationForm() {
               </FormItem>
             )}
           />
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Name (Thai)</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Name (Thai)</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <FormField
               control={form.control}
@@ -208,10 +221,14 @@ export function MasterRegistrationForm() {
               )}
             />
           </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Name (English)</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Name (English)</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <FormField
               control={form.control}
@@ -253,10 +270,14 @@ export function MasterRegistrationForm() {
               )}
             />
           </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Course history</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Course history</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <FormField
             control={form.control}
             name="idCardNumber"
@@ -324,10 +345,14 @@ export function MasterRegistrationForm() {
               )}
             />
           </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Documents</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Documents</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <p className="text-sm font-medium">ID card</p>
             <FileUpload
@@ -346,7 +371,8 @@ export function MasterRegistrationForm() {
               label="Upload photo"
             />
           </div>
-        </section>
+          </CardContent>
+        </Card>
 
         <div className="flex justify-end">
           <Button

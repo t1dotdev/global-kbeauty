@@ -10,6 +10,12 @@ import { z } from "zod";
 import { FileUpload } from "~/components/file-upload";
 import { Button } from "~/components/ui/button";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import {
   Form,
   FormControl,
   FormField,
@@ -102,8 +108,11 @@ export function CenterRegistrationForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Center</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Center</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <FormField
             control={form.control}
             name="name"
@@ -130,10 +139,14 @@ export function CenterRegistrationForm() {
               </FormItem>
             )}
           />
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Director</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Director</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <div className="grid gap-4 sm:grid-cols-3">
             <FormField
               control={form.control}
@@ -175,10 +188,14 @@ export function CenterRegistrationForm() {
               </FormItem>
             )}
           />
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Operations</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Operations</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <FormField
             control={form.control}
             name="vocationalFields"
@@ -236,10 +253,14 @@ export function CenterRegistrationForm() {
               )}
             />
           </div>
-        </section>
+          </CardContent>
+        </Card>
 
-        <section className="grid gap-4 rounded-2xl border bg-white p-6">
-          <h2 className="text-base font-semibold">Documents</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Documents</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <p className="text-sm font-medium">Director ID card</p>
             <FileUpload
@@ -267,7 +288,8 @@ export function CenterRegistrationForm() {
               label="Upload photo"
             />
           </div>
-        </section>
+          </CardContent>
+        </Card>
 
         <div className="flex justify-end gap-2">
           <Button
