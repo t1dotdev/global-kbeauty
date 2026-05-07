@@ -2,7 +2,7 @@ import { StudentCertificates } from "./student-certificates";
 
 export default function StudentCertificatesPage() {
   return (
-    <main className="w-full p-8">
+    <main className="w-full p-4 lg:p-6">
       <header className="mb-4">
         <h1 className="text-xl font-semibold tracking-tight">
           My certificates

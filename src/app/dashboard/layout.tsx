@@ -68,9 +68,29 @@ export default async function DashboardLayout({
             </h1>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="outline" size="icon" aria-label="Notifications">
-              <BellIcon className="size-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="Notifications"
+                  />
+                }
+              >
+                <BellIcon className="size-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <div className="text-muted-foreground flex flex-col items-center justify-center gap-2 px-3 py-8 text-center">
+                  <BellIcon className="size-6 opacity-50" />
+                  <p className="text-sm">No notifications yet</p>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <div className="hidden sm:block">
               <LocaleSwitcher />
             </div>

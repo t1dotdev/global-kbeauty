@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Building2,
+  Inbox,
+  KeyRound,
+  Loader2,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -28,57 +38,174 @@ type Kind = "master" | "center" | "admin";
 
 const AMOUNT_RE = /^\d+(\.\d{1,2})?$/;
 
+const KIND_META: Record<
+  Kind,
+  {
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badgeClass: string;
+    accent: string;
+  }
+> = {
+  master: {
+    label: "Master",
+    icon: Sparkles,
+    badgeClass: "border-purple-200 bg-purple-50 text-purple-700",
+    accent: "text-purple-600",
+  },
+  center: {
+    label: "Center",
+    icon: Building2,
+    badgeClass: "border-blue-200 bg-blue-50 text-blue-700",
+    accent: "text-blue-600",
+  },
+  admin: {
+    label: "Admin",
+    icon: ShieldCheck,
+    badgeClass: "border-amber-200 bg-amber-50 text-amber-800",
+    accent: "text-amber-600",
+  },
+};
+
+function formatThb(value: string) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return value;
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(n);
+}
+
 export function RolesAdmin() {
   const list = api.role.list.useQuery();
   const [editing, setEditing] = useState<Role | "new" | null>(null);
 
+  const items = list.data ?? [];
+  const counts = items.reduce<Record<Kind, number>>(
+    (acc, r) => {
+      acc[r.kind as Kind] = (acc[r.kind as Kind] ?? 0) + 1;
+      return acc;
+    },
+    { master: 0, center: 0, admin: 0 },
+  );
+
   return (
-    <section className="rounded-2xl border bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b p-4">
-        <h2 className="text-base font-semibold">All roles</h2>
-        <Button onClick={() => setEditing("new")}>New role</Button>
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        {(Object.keys(KIND_META) as Kind[]).map((kind) => (
+          <StatCard
+            key={kind}
+            label={KIND_META[kind].label}
+            value={counts[kind] ?? 0}
+            Icon={KIND_META[kind].icon}
+            accent={KIND_META[kind].accent}
+          />
+        ))}
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Kind</TableHead>
-            <TableHead>Level</TableHead>
-            <TableHead>Payout (THB)</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {list.data?.length === 0 && (
+
+      <section className="bg-card rounded-2xl border shadow-sm">
+        <div className="flex items-center justify-between gap-3 border-b p-4">
+          <div className="flex items-center gap-3">
+            <div>
+              <h2 className="text-base font-semibold">All roles</h2>
+              <p className="text-muted-foreground text-sm">
+                {items.length} total · payouts in THB
+              </p>
+            </div>
+            {list.isFetching ? (
+              <Loader2 className="text-muted-foreground size-4 animate-spin" />
+            ) : null}
+          </div>
+          <Button onClick={() => setEditing("new")}>
+            <Plus className="size-4" />
+            New role
+          </Button>
+        </div>
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-neutral-500">
-                No roles yet.
-              </TableCell>
+              <TableHead>Name</TableHead>
+              <TableHead className="w-[140px]">Kind</TableHead>
+              <TableHead className="w-[80px]">Level</TableHead>
+              <TableHead className="w-[140px] text-right">
+                Payout (THB)
+              </TableHead>
+              <TableHead className="hidden md:table-cell">
+                Description
+              </TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          )}
-          {list.data?.map((r) => (
-            <TableRow key={r.id}>
-              <TableCell className="font-medium">{r.name}</TableCell>
-              <TableCell className="capitalize">{r.kind}</TableCell>
-              <TableCell>{r.level ?? "—"}</TableCell>
-              <TableCell>{r.amountThb}</TableCell>
-              <TableCell className="max-w-md truncate text-neutral-500">
-                {r.description}
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setEditing(r)}
-                >
-                  Edit
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {list.isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-12 text-center">
+                  <Loader2 className="text-muted-foreground mx-auto size-5 animate-spin" />
+                </TableCell>
+              </TableRow>
+            ) : items.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-12">
+                  <div className="text-muted-foreground flex flex-col items-center gap-2">
+                    <Inbox className="size-8" />
+                    <p className="text-sm font-medium">No roles yet</p>
+                    <p className="text-xs">
+                      Create one to define payouts and permissions.
+                    </p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              items.map((r) => {
+                const meta = KIND_META[r.kind as Kind] ?? {
+                  label: r.kind,
+                  icon: KeyRound,
+                  badgeClass: "",
+                  accent: "",
+                };
+                const Icon = meta.icon;
+                return (
+                  <TableRow key={r.id}>
+                    <TableCell className="font-medium">{r.name}</TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={`gap-1.5 ${meta.badgeClass}`}
+                      >
+                        <Icon className="size-3.5" />
+                        {meta.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {r.level != null ? (
+                        <span className="font-mono text-sm">Lv {r.level}</span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right font-mono tabular-nums">
+                      {formatThb(r.amountThb)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground hidden max-w-md truncate md:table-cell">
+                      {r.description ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setEditing(r)}
+                      >
+                        Edit
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </section>
+
       {editing ? (
         <RoleDialog
           initial={editing === "new" ? null : editing}
@@ -88,7 +215,35 @@ export function RolesAdmin() {
           }}
         />
       ) : null}
-    </section>
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  Icon,
+  accent,
+}: {
+  label: string;
+  value: number;
+  Icon: React.ComponentType<{ className?: string }>;
+  accent: string;
+}) {
+  return (
+    <div className="bg-card flex items-center gap-3 rounded-2xl border p-4 shadow-sm">
+      <div
+        className={`bg-muted flex size-10 items-center justify-center rounded-lg ${accent}`}
+      >
+        <Icon className="size-5" />
+      </div>
+      <div>
+        <div className="text-muted-foreground text-xs tracking-wide uppercase">
+          {label}
+        </div>
+        <div className="text-2xl font-semibold tabular-nums">{value}</div>
+      </div>
+    </div>
   );
 }
 

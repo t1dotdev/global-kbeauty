@@ -7,7 +7,7 @@ export default async function MasterDashboardPage() {
   const t = await getTranslations();
   const status = session?.user?.status;
   return (
-    <main className="w-full p-8">
+    <main className="w-full p-4 lg:p-6">
       <header className="mb-4">
         <h1 className="text-xl font-semibold tracking-tight">
           {t("register.master")}

@@ -1,6 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Award,
+  Building2,
+  Inbox,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -23,61 +31,149 @@ import { Textarea } from "~/components/ui/textarea";
 import { api, type RouterOutputs } from "~/trpc/react";
 
 type QueueItem = RouterOutputs["approval"]["myQueue"][number];
+type Kind = QueueItem["kind"];
+
+const KIND_META: Record<
+  Kind,
+  {
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    badgeClass: string;
+    accent: string;
+  }
+> = {
+  center: {
+    label: "Center",
+    icon: Building2,
+    badgeClass: "border-blue-200 bg-blue-50 text-blue-700",
+    accent: "text-blue-600",
+  },
+  master: {
+    label: "Master",
+    icon: Sparkles,
+    badgeClass: "border-purple-200 bg-purple-50 text-purple-700",
+    accent: "text-purple-600",
+  },
+  student: {
+    label: "Student",
+    icon: Award,
+    badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    accent: "text-emerald-600",
+  },
+};
 
 export function ApprovalsTable() {
   const queue = api.approval.myQueue.useQuery();
   const [active, setActive] = useState<QueueItem | null>(null);
 
+  const items = queue.data ?? [];
+  const counts = items.reduce<Record<Kind, number>>(
+    (acc, item) => {
+      acc[item.kind] = (acc[item.kind] ?? 0) + 1;
+      return acc;
+    },
+    { center: 0, master: 0, student: 0 },
+  );
+
   return (
-    <section className="rounded-2xl border bg-white shadow-sm">
-      <div className="border-b p-4">
-        <h2 className="text-base font-semibold">Pending approvals</h2>
-        <p className="text-sm text-neutral-500">
-          {queue.data?.length ?? 0} item(s) awaiting your decision.
-        </p>
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        {(Object.keys(KIND_META) as Kind[]).map((kind) => (
+          <StatCard
+            key={kind}
+            label={KIND_META[kind].label}
+            value={counts[kind] ?? 0}
+            Icon={KIND_META[kind].icon}
+            accent={KIND_META[kind].accent}
+          />
+        ))}
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead>Target</TableHead>
-            <TableHead>Step</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {queue.data?.length === 0 && (
+
+      <section className="bg-card rounded-2xl border shadow-sm">
+        <div className="flex items-center justify-between gap-3 border-b p-4">
+          <div>
+            <h2 className="text-base font-semibold">Pending approvals</h2>
+            <p className="text-muted-foreground text-sm">
+              {items.length} item(s) awaiting your decision.
+            </p>
+          </div>
+          {queue.isFetching ? (
+            <Loader2 className="text-muted-foreground size-4 animate-spin" />
+          ) : null}
+        </div>
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={4} className="text-center text-neutral-500">
-                Nothing in your queue.
-              </TableCell>
+              <TableHead className="w-[140px]">Type</TableHead>
+              <TableHead>Target</TableHead>
+              <TableHead className="hidden md:table-cell">Step</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          )}
-          {queue.data?.map((item) => (
-            <TableRow key={item.step.id}>
-              <TableCell>
-                <Badge variant="secondary" className="capitalize">
-                  {item.kind}
-                </Badge>
-              </TableCell>
-              <TableCell>{describeTarget(item)}</TableCell>
-              <TableCell>
-                <span className="text-xs text-neutral-500">
-                  Step {item.step.orderIndex + 1} · {item.step.requiredKind}
-                  {item.step.requiredRoleLevel != null
-                    ? ` Lv ${item.step.requiredRoleLevel}`
-                    : ""}
-                </span>
-              </TableCell>
-              <TableCell className="text-right">
-                <Button size="sm" onClick={() => setActive(item)}>
-                  Review
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {queue.isLoading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="py-12 text-center">
+                  <Loader2 className="text-muted-foreground mx-auto size-5 animate-spin" />
+                </TableCell>
+              </TableRow>
+            ) : items.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="py-12">
+                  <div className="text-muted-foreground flex flex-col items-center gap-2">
+                    <Inbox className="size-8" />
+                    <p className="text-sm font-medium">Nothing in your queue</p>
+                    <p className="text-xs">
+                      You&apos;re all caught up. Check back later.
+                    </p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              items.map((item) => {
+                const meta = KIND_META[item.kind] ?? {
+                  label: item.kind,
+                  icon: ShieldCheck,
+                  badgeClass: "",
+                  accent: "",
+                };
+                const Icon = meta.icon;
+                return (
+                  <TableRow key={item.step.id}>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={`gap-1.5 ${meta.badgeClass}`}
+                      >
+                        <Icon className="size-3.5" />
+                        {meta.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {describeTarget(item)}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <span className="text-muted-foreground text-xs">
+                        Step {item.step.orderIndex + 1} ·{" "}
+                        {item.step.requiredKind}
+                        {item.step.requiredRoleLevel != null
+                          ? ` Lv ${item.step.requiredRoleLevel}`
+                          : ""}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" onClick={() => setActive(item)}>
+                        Review
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      </section>
+
       {active ? (
         <DecideDialog
           item={active}
@@ -87,7 +183,35 @@ export function ApprovalsTable() {
           }}
         />
       ) : null}
-    </section>
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  Icon,
+  accent,
+}: {
+  label: string;
+  value: number;
+  Icon: React.ComponentType<{ className?: string }>;
+  accent: string;
+}) {
+  return (
+    <div className="bg-card flex items-center gap-3 rounded-2xl border p-4 shadow-sm">
+      <div
+        className={`bg-muted flex size-10 items-center justify-center rounded-lg ${accent}`}
+      >
+        <Icon className="size-5" />
+      </div>
+      <div>
+        <div className="text-muted-foreground text-xs tracking-wide uppercase">
+          {label}
+        </div>
+        <div className="text-2xl font-semibold tabular-nums">{value}</div>
+      </div>
+    </div>
   );
 }
 
@@ -154,7 +278,7 @@ function DecideDialog({
                 placeholder="BKK"
                 maxLength={4}
               />
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="text-muted-foreground mt-1 text-xs">
                 Will produce code GKB-CTR-
                 {centerCodeSuffix || "XXX"}.
               </p>
