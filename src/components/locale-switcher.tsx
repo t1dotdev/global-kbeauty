@@ -11,17 +11,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { api } from "~/trpc/react";
+import { setLocale as persistLocale } from "~/i18n/locale-action";
 
 export function LocaleSwitcher() {
   const t = useTranslations("locale");
   const locale = useLocale();
   const router = useRouter();
-  const set = api.user.setLocale.useMutation({
-    onSuccess: () => router.refresh(),
-  });
   const setLocale = (value: "en" | "kr") => {
-    if (value !== locale) set.mutate({ locale: value });
+    if (value === locale) return;
+    void persistLocale(value).then(() => router.refresh());
   };
 
   return (

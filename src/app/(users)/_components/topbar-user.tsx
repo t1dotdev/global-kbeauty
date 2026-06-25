@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOutIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon } from "lucide-react";
+import Link from "next/link";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -16,9 +17,11 @@ import {
 
 export function TopbarUser({
   user,
+  dashboard,
   onSignOut,
 }: {
   user: { name: string; email: string; image: string | null };
+  dashboard?: { href: string; label: string };
   onSignOut: () => Promise<void>;
 }) {
   const initials = (user.name || user.email).trim().slice(0, 2).toUpperCase();
@@ -49,6 +52,12 @@ export function TopbarUser({
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        {dashboard ? (
+          <DropdownMenuItem render={<Link href={dashboard.href} />}>
+            <LayoutDashboardIcon />
+            {dashboard.label}
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem
           onClick={() => {
             void onSignOut();

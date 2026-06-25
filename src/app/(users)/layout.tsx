@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 
 import { LocaleSwitcher } from "~/components/locale-switcher";
 import { ThemeSwitcher } from "~/components/theme-switcher";
+import { buttonVariants } from "~/components/ui/button";
 import { auth, signOut } from "~/server/auth";
 
 import { TopbarUser } from "./_components/topbar-user";
@@ -36,6 +37,22 @@ export default async function UsersLayout({
             {t("app.name")}
           </span>
         </Link>
+        <nav className="hidden items-center gap-1 md:flex">
+          {[
+            { href: "/", label: t("nav.home") },
+            { href: "/centers", label: t("nav.centers") },
+            { href: "/masters", label: t("nav.masters") },
+            { href: "/students", label: t("nav.students") },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={buttonVariants({ variant: "ghost", size: "sm" })}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
         <div className="flex items-center gap-2">
           <LocaleSwitcher />
           <ThemeSwitcher />
@@ -46,9 +63,21 @@ export default async function UsersLayout({
                 email: session.user.email ?? "",
                 image: session.user.image ?? null,
               }}
+              dashboard={
+                session.user.roleKind === "admin"
+                  ? { href: "/dashboard/admin", label: t("nav.dashboard") }
+                  : undefined
+              }
               onSignOut={handleSignOut}
             />
-          ) : null}
+          ) : (
+            <Link
+              href="/login"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              {t("auth.signIn")}
+            </Link>
+          )}
         </div>
       </header>
       <div className="flex flex-1 flex-col">{children}</div>

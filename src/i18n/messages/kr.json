@@ -48,7 +48,11 @@
     "myCertificates": "내 인증서",
     "myCertificatesDesc": "발급된 인증서 및 대기 중인 요청",
     "requestCertificate": "인증서 요청",
-    "requestCertificateDesc": "코스를 선택하고 승인을 위해 제출"
+    "requestCertificateDesc": "코스를 선택하고 승인을 위해 제출",
+    "centers": "센터",
+    "masters": "마스터",
+    "home": "홈",
+    "dashboard": "대시보드"
   },
   "declined": {
     "title": "신청이 거절됨",
