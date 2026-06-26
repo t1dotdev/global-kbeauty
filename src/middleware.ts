@@ -4,7 +4,7 @@ import { authEdgeConfig } from "~/server/auth/config.edge";
 
 const { auth: authMiddleware } = NextAuth(authEdgeConfig);
 
-const PUBLIC_PATHS = ["/", "/login"];
+const PUBLIC_PATHS = ["/", "/login", "/centers", "/masters", "/students"];
 const PUBLIC_PREFIXES = ["/certificate/", "/api/", "/_next/", "/favicon"];
 
 function isPublic(pathname: string) {
