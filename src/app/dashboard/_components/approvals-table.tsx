@@ -60,6 +60,12 @@ const KIND_META: Record<
     badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700",
     accent: "text-emerald-600",
   },
+  cert_request: {
+    label: "Certificate",
+    icon: ShieldCheck,
+    badgeClass: "border-amber-200 bg-amber-50 text-amber-700",
+    accent: "text-amber-600",
+  },
 };
 
 export function ApprovalsTable() {
@@ -67,13 +73,13 @@ export function ApprovalsTable() {
   const [active, setActive] = useState<QueueItem | null>(null);
 
   const items = queue.data ?? [];
-  const counts = items.reduce<Record<Kind, number>>(
-    (acc, item) => {
-      acc[item.kind] = (acc[item.kind] ?? 0) + 1;
-      return acc;
-    },
-    { center: 0, master: 0, student: 0 },
-  );
+  const counts: Record<Kind, number> = {
+    center: 0,
+    master: 0,
+    student: 0,
+    cert_request: 0,
+  };
+  for (const item of items) counts[item.kind] += 1;
 
   return (
     <div className="space-y-4">

@@ -59,7 +59,7 @@ export function UsersAdmin() {
     };
     for (const u of list.data ?? []) {
       c.all += 1;
-      const key = (u.roleKind ?? "none") as Exclude<Filter, "all">;
+      const key = u.roleKind ?? "none";
       c[key] += 1;
     }
     return c;
@@ -138,10 +138,7 @@ export function UsersAdmin() {
             </TableRow>
           ) : (
             visible.map((u) => {
-              const variantKey = (u.roleKind ?? "none") as Exclude<
-                Filter,
-                "all"
-              >;
+              const variantKey = u.roleKind ?? "none";
               const initials = (u.name ?? u.email)
                 .split(/\s+/)
                 .filter(Boolean)

@@ -83,7 +83,7 @@ export function RolesAdmin() {
   const items = list.data ?? [];
   const counts = items.reduce<Record<Kind, number>>(
     (acc, r) => {
-      acc[r.kind as Kind] = (acc[r.kind as Kind] ?? 0) + 1;
+      acc[r.kind] = (acc[r.kind] ?? 0) + 1;
       return acc;
     },
     { master: 0, center: 0, admin: 0 },
@@ -157,7 +157,7 @@ export function RolesAdmin() {
               </TableRow>
             ) : (
               items.map((r) => {
-                const meta = KIND_META[r.kind as Kind] ?? {
+                const meta = KIND_META[r.kind] ?? {
                   label: r.kind,
                   icon: KeyRound,
                   badgeClass: "",
